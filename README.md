@@ -10,7 +10,7 @@ Functions executed via `el_run` and other Lua commands will attempt to return no
   <img src="https://github.com/user-attachments/assets/2989d9e1-32e5-4b6e-99c4-091d865901ab">
 </p>
 
-If a command returns a vector (position), EEL will always visually display it. If it returns an entity, EEL will highlight it in the game, even if the entity is server-side only.
+If a command returns a vector (position), EEL will visually display it. If it returns an entity, EEL will highlight it in the game, even if the entity is server-side only.
 
 ## Commands
 
