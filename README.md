@@ -87,7 +87,7 @@ EEL uses "CAMI" to integrate with admin-mods, giving you control over who can us
 
 ## Installation
 
-1. Download the latest release as a `.zip` file.
+1. Download the latest release as a `.zip` [file](https://github.com/Nak2/Eel/archive/refs/heads/main.zip).
 2. Extract the contents of the `.zip` file.
 3. Move the extracted folder into your Garry's Mod `addons` directory. <br>The final path should look like this: `garrysmod/addons/eel/`
 4. Ensure that the `eel` folder contains the `lua` folder and other necessary files for the addon.
