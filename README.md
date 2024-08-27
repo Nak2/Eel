@@ -1,32 +1,18 @@
 # EEL - Easy Efficient Lua
 
-EEL (Easy Efficient Lua) is an addon designed to make Garry's Mod addon development a breeze. With EEL, you can quickly run Lua commands, interact with entities, and automate repetitive tasks with ease. Whether you're a seasoned developer or just getting started, EEL provides powerful tools to streamline your workflow.
+EEL (Easy Efficient Lua) is an addon designed to make Garry's Mod addon development a breeze. With EEL, you can quickly run Lua commands, interact with entities, and automate repetitive tasks with ease. Whether you're a seasoned developer or just getting started.
 
-## Function Definitions
-Functions executed via `el_run` and other Lua commands will attempt to return not only the result but also the function definition along with its parameters. This helps in understanding how the function operates and in debugging.
+## Execution and Returns
+
+Functions executed via `el_run` and other Lua commands will attempt to return not only the result but also the function definition along with its parameters. This aids in understanding how the function operates and assists in debugging.
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2989d9e1-32e5-4b6e-99c4-091d865901ab">
 </p>
 
-## Lua Command Returns
-EEL doesn't just execute commands—it also returns values. For example:
-```
-el_run this
-```
-Will return the entity you're looking at.
-```
-el_run this:GetColor()
-```
+If a command returns a vector (position), EEL will always visually display it. If it returns an entity, EEL will highlight it in the game, even if the entity is server-side only.
 
-Will return the color of the entity.
-
-```
-el_run this:GetBonePosition(1)
-```
-
-Will return two variables: an entity and an angle.
-
-## Features
+## Commands
 
 ### `el_run` Command
 The `el_run` command allows you to execute Lua code effortlessly. It’s semi-smart, meaning it will try to automatically resolve nil variables by mapping them to common references:
