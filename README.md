@@ -14,7 +14,7 @@ If a command returns a vector (position), EEL will always visually display it. I
 
 ## Commands
 
-### `el_run` Command
+### `el_run <code>` Command
 The `el_run` command allows you to execute Lua code effortlessly. It’s semi-smart, meaning it will try to automatically resolve nil variables by mapping them to common references:
 
 - `me` / `self` - The player who calls the function.
@@ -42,19 +42,19 @@ el_run nak:SetPos(there)
 <details>
   <summary>Show all commands</summary>
 
-### `el_run_cl` Command
+### `el_run_cl <code>` Command
 
 This is the clientside equivalent of el_run, enabling you to run Lua code on the client.
 
-### `el_sealed` Command
+### `el_sealed <code>` Command
 
 The el_sealed command runs Lua code within a custom environment, giving you more control and isolation.
 
-### `el_sealed_cl` Command
+### `el_sealed_cl <code>` Command
 
 Clientside version of el_sealed.
 
-### `el_lazy` Command
+### `el_lazy <code>` Command
 
 Feeling lazy? The el_lazy command automatically fills in parentheses for you. For example:
 ```
@@ -65,15 +65,15 @@ Is the same as:
 el_run me:SetPos(there)
 ```
 
-### `el_lazy_cl` Command
+### `el_lazy_cl <code>` Command
 
 Clientside version of el_lazy.
 
-### 'el_delete_all <entity class>' Command
+### `el_delete_all <entity class>` Command
 
 This command deletes all entities of a given class on the map. It also tries to autofill nearby entities for convenience.
 
-### 'el_spawn <entity class> <amount>' Command
+### `el_spawn <entity class> <amount>` Command
 
 Spawns a specified number of entities. By default, it spawns one entity.
 
