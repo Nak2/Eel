@@ -252,11 +252,16 @@ local function runLua(ply, code, readOnly)
 end
 
 local function autoComplete(cmd, argStr)
-    if string.match(argStr,"[=]+") ~= "=" then
-        argStr = "return " .. argStr
+    -- Try and compile a return
+    local returnCode = "return " .. argStr
+
+    local compileStr = CompileString(returnCode, "", false)
+
+    -- If we fail, remove the return and try again
+    if not isfunction(compileStr) then
+        compileStr = CompileString(argStr, "", false)
     end
 
-    local compileStr = CompileString(argStr, "", false)
     if not isfunction(compileStr) then
         -- Remove "near '<eof>'" if string ends with it
         compileStr = string.match(compileStr --[[@as string]], "^(.-)near '<eof>'$") or compileStr
