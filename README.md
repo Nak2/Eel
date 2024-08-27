@@ -37,6 +37,11 @@ Example:
 el_run nak:SetPos(there)
 ```
 
+<br>
+
+<details>
+  <summary>Show all commands</summary>
+
 ### `el_run_cl` Command
 
 This is the clientside equivalent of el_run, enabling you to run Lua code on the client.
@@ -71,6 +76,10 @@ This command deletes all entities of a given class on the map. It also tries to 
 ### 'el_spawn <entity class> <amount>' Command
 
 Spawns a specified number of entities. By default, it spawns one entity.
+
+</details>
+
+
 
 ## Permission Management
 
