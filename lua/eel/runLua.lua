@@ -141,6 +141,9 @@ local function print_value(v,i,e)
     elseif t == "Angle" then
         -- Angle
         _msgC(Eel.RealmColor,i .. "Angle("  .. v.p .. ", " .. v.y .. ", " .. v.r .. ")")
+    elseif t == "string" then
+        -- String
+        _msgC(Eel.RealmColor,i .. "\"" .. v .. "\"")
     elseif t == "function" then
         -- Function
         local name,source = Eel.GetFunctionData(v)
