@@ -135,6 +135,12 @@ local function print_value(v,i,e)
             _msgC(Eel.RealmColor,i .. " " .. tostring(v) .. e .. "\n")
             return v
         end
+    elseif t == "Vector" then
+        -- Vector
+        _msgC(Eel.RealmColor,i .. "Vector("  .. v.x .. ", " .. v.y .. ", " .. v.z .. ")")
+    elseif t == "Angle" then
+        -- Angle
+        _msgC(Eel.RealmColor,i .. "Angle("  .. v.p .. ", " .. v.y .. ", " .. v.r .. ")")
     elseif t == "function" then
         -- Function
         local name,source = Eel.GetFunctionData(v)
@@ -170,7 +176,7 @@ local function rPrint(s, l, i, mdone)
     for k,v in pairs(s) do
         if tostring(k) == "__map" then continue end
         local str_i = i .. "\t[" .. tostring(k) .. "]"
-        l = rPrint(v, l, str_i .. string.rep(" ",math.max(1, 12 - #str_i)), mdone);
+        l = rPrint(v, l, str_i .. "\t" , mdone);
         if (l < 0) then break end
     end
     return l
