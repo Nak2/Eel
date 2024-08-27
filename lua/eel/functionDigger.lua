@@ -105,6 +105,7 @@ function Eel.GetFunctionData(f)
     local tab = debug.getinfo(f)
     if not tab then return "Unknown","Unknown" end
     local source = tab["short_src"] or "Unknown"
+    source = source .. "#L" .. (tab["linedefined"] or 0)
 
     local name = getFunctionDef(f)
     cache[f] = {name,source}

@@ -202,11 +202,17 @@ local function niceText(str)
 end
 
 local function runLua(ply, code, readOnly)
-    if string.match(code,"[=]+") ~= "=" then
-        code = "return " .. code
-    end
+    -- Try and compile a return
+    local returnCode = "return " .. code
+
     local envName = (ply and ply:Nick() or "Console") .. "'s Environment"
-    local compiler = CompileString(code, envName, false)
+    local compiler = CompileString(returnCode, envName, false)
+
+    -- If we fail, remove the return and try again
+    if not isfunction(compiler) then
+        compiler = CompileString(code, envName, false)
+    end
+
     if isfunction(compiler) then
         local env = CreateEnv(ply, readOnly)
         setfenv(compiler, env)
