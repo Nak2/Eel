@@ -4,7 +4,7 @@ EEL (Easy Efficient Lua) is an addon designed to make Garry's Mod addon developm
 
 ## Execution and Returns
 
-Functions executed via `el_run` and other Lua commands will attempt to return not only the result but also the function definition along with its parameters. This aids in understanding how the function operates and assists in debugging.
+Lua executed via `el_run` and other commands will attempt to return not only the result but also the function definition along with its parameters. This aids in understanding how the function operates and assists in debugging.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2989d9e1-32e5-4b6e-99c4-091d865901ab">
