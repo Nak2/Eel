@@ -6,7 +6,11 @@ local whiteList = {
 if SERVER then
     util.AddNetworkString("easy_luadebugger")
 
-    function Eel.DebugVar(var)
+    ---Debug displays a variable on the client's screen.
+    ---@param var any
+    ---@param ply Player?
+    function Eel.DebugVar(var, ply)
+        if not ply then return end -- Ignore consoles
         local t = type(var)
         local id = whiteList[t]
         if not whiteList[t] then return end
@@ -19,7 +23,7 @@ if SERVER then
                 net.WriteVector(var:GetPos())
                 net.WriteString(var:GetClass())
             end
-        net.Broadcast()
+        net.Send(ply)
     end
     return
 end
@@ -123,7 +127,7 @@ local function renderEntitites(a, b, c)
     end
 end
 
-function Eel.DebugVar(var)
+function Eel.DebugVar(var, _)
     local id = whiteList[type(var)]
     if not id then return end
     if id == 1 then

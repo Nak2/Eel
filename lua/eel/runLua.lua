@@ -28,13 +28,13 @@ local blackList = {
     ["physgun_beam"] = true
 }
 local function FindNear(ply, origin)
-    local tab = ents.FindInSphere(origin, 2000)
+    local tab = ents.FindInSphere(origin, 2000) ---@as Entity[]
     local t = {}
     for _,v in ipairs(tab) do
         if v == ply then continue end
         local ty = type(v)
-        -- Check we're not holding a weapon that gets target
-        if ty == "Weapon" and v:GetOwner() == ply then continue end
+        -- Check we're not holding a weapon that gets target or something parented to us
+        if v:GetParent() == ply or ty == "Weapon" and v:GetOwner() == ply then continue end
 
         local cl = v:GetClass()
         if blackList[cl] then continue end
@@ -226,14 +226,14 @@ local function runLua(ply, code, readOnly)
             if #callTab == 1 then
                 _msgC(Color(255,255,255), " - ")
                 elprint(callTab[1])
-                Eel.DebugVar(callTab[1])
+                Eel.DebugVar(callTab[1], ply)
             else
                 for i,v in pairs(callTab) do
                     -- A function can have multiple return values
                     -- Put a message for each id
                     _msgC(Color(255,255,255), string.format(" %i: - ", i))
                     elprint(v)
-                    Eel.DebugVar(callTab[i])
+                    Eel.DebugVar(callTab[i], ply)
                 end
             end
         end

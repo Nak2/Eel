@@ -3,7 +3,7 @@
 AddCSLuaFile()
 
 Eel = {}
-Eel.Version = 20240828
+Eel.Version = 20240829
 
 -- El's theme color
 Eel.Color = Color(65, 105, 225)
