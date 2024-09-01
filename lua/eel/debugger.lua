@@ -14,6 +14,7 @@ if SERVER then
         local t = type(var)
         local id = whiteList[t]
         if not whiteList[t] then return end
+        if id == 2 and not IsValid(var) then return end
         net.Start("easy_luadebugger")
             net.WriteUInt(id, 8)
             if id == 1 then
