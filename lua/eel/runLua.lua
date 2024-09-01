@@ -7,8 +7,8 @@ local scanList = {}
     scanList[1] = function(name, pos) return Eel.FindNearest(Eel.FindPlayer(name), pos) end
     scanList[2] = function(name, pos) return Eel.FindNearest(ents.FindByClass(name), pos) end
     scanList[3] = function(name, pos) return Eel.FindNearest(ents.FindByName(name), pos) end
-    scanList[4] = function(name, pos) return Eel.FindNearest(ents.FindByModel(name), pos) end
-    scanList[6] = function(name, pos) return Eel.FindNearest(Eel.FilterByClass(name), pos) end
+    scanList[4] = function(name, pos) return Eel.FindNearest(Eel.FilterByClass(name), pos) end
+    scanList[5] = function(name, pos) return Eel.FindNearest(ents.FindByModel("*" .. name .. "**"), pos) end
 
 ---An advanced function to find the nearest object by name, class, model, or player name
 ---@param origin Vector
