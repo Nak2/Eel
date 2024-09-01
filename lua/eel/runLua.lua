@@ -45,6 +45,15 @@ local function FindNear(ply, origin)
     return Eel.FindNearest(t, origin)
 end
 
+local function FindProx(ply, pos)
+    local results = {}
+    for _,v in ipairs(ents.FindInSphere(pos, 128)) do
+        if v == ply or v:GetParent() == ply or v:GetOwner() == ply then continue end
+        table.insert(results, v)
+    end
+    return results
+end
+
 --#endregion
 
 --#region Environment
@@ -105,7 +114,7 @@ local function CreateEnv(ply, readOnly)
         
         newEnv.here = ply:GetPos()
         newEnv.there = trace.HitPos
-
+        newEnv.prox = FindProx(ply, trace.HitPos)
         newEnv.near = FindNear(ply, trace.HitPos)
     end
 
