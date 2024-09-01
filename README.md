@@ -1,6 +1,6 @@
-# EEL - Easy Efficient Lua
+# EEL - Enhanced Execution Layer
 
-EEL (Easy Efficient Lua) is an addon designed to make Garry's Mod addon development a breeze. With EEL, you can quickly run Lua commands, interact with entities, and automate repetitive tasks with ease. Whether you're a seasoned developer or just getting started.
+EEL (Enhanced Execution Layer) is an addon designed to make Garry's Mod addon development a breeze. With EEL, you can quickly run Lua commands, interact with entities, and automate repetitive tasks with ease. Whether you're a seasoned developer or just getting started.
 
 ## Execution and Returns
 
