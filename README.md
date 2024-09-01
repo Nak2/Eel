@@ -23,7 +23,8 @@ The `el_run` command allows you to execute Lua code effortlessly. It’s semi-sm
 - `this` / `that` - The entity you're looking at.
 - `here` - Your current location.
 - `there` - The location you're aiming at.
-- `near` - The nearest entity to you.
+- `near` - The nearest entity to the location you're aiming at.
+- `prox` - All entities within your aim position, at a range of 128 units.
 
 If the command encounters an unknown variable, it will search in the following order:
 1. Player names
