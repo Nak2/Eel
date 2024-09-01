@@ -45,9 +45,9 @@ local function FindNear(ply, origin)
     return Eel.FindNearest(t, origin)
 end
 
-local function FindProx(ply, pos)
+local function FindProx(ply, pos, dist)
     local results = {}
-    for _,v in ipairs(ents.FindInSphere(pos, 128)) do
+    for _,v in ipairs(ents.FindInSphere(pos, dist)) do
         if v == ply or v:GetParent() == ply or v:GetOwner() == ply then continue end
         table.insert(results, v)
     end
@@ -94,28 +94,49 @@ local function _msgN(noDupe)
     end
 end
 
+local function getPlyEnv(ply, env)
+    local trace = ply:GetEyeTrace()
+    return setmetatable({
+        me = ply,
+        self = ply,
+        wep = ply:GetActiveWeapon(),
+
+        trace = trace,
+        this = trace.Entity,
+        that = trace.Entity,
+
+        here = ply:GetPos(),
+        there = trace.HitPos,
+    }, {__index = function(t, k)
+        if k == "near" then
+            local near = FindNear(ply, trace.HitPos)
+            rawset(env, "near", near)
+            return near
+        elseif k == "nearme" then
+            local nearme = FindNear(ply, ply:GetPos())
+            rawset(env, "nearme", nearme)
+            return nearme
+        elseif string.sub(k, 1, 3) == "ent" then
+            local num = tonumber(string.sub(k, 4))
+            if not num then return NULL end
+            rawset(env, k, Entity(num))
+            return Entity(num)
+        elseif string.sub(k, 1, 4) == "prox" then
+            local num = tonumber(string.sub(k, 5)) or 128
+            local prox = FindProx(ply, trace.HitPos, num or 128)
+            rawset(env, k, prox)
+            return prox
+        end
+    end})
+end
+
 local function CreateEnv(ply, readOnly)
     local metaTab = {}
     local newEnv = {}
+    local inDex = getPlyEnv(ply, newEnv)
 
     metaTab.__index = function(t, k)
-        return rawget(newEnv, k) or rawget(_G, k) or FindObject(ply:GetPos(), k)
-    end
-    
-    if ply and IsValid(ply) then
-        newEnv.me = ply
-        newEnv.self = ply
-        newEnv.wep = ply:GetActiveWeapon()
-        
-        local trace = ply:GetEyeTrace()
-        newEnv.trace = trace
-        newEnv.this = trace.Entity
-        newEnv.that = newEnv.this
-        
-        newEnv.here = ply:GetPos()
-        newEnv.there = trace.HitPos
-        newEnv.prox = FindProx(ply, trace.HitPos)
-        newEnv.near = FindNear(ply, trace.HitPos)
+        return rawget(_G, k) or inDex[k] or FindObject(ply:GetPos(), k)
     end
 
     if not readOnly then

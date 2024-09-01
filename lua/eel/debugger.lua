@@ -147,21 +147,23 @@ local function addPosition(vec)
     hook.Add("PostDrawTranslucentRenderables", "easy_luadebugger", renderPositions)
 end
 
-local function addEntity(ent, pos, class)
-    debugEnts[ent] = {ent = ent, time = CurTime() + 15, pos = pos, class = class}
+local function addEntity(entId, ent, pos, class)
+    debugEnts[entId] = {ent = ent, time = CurTime() + 15, pos = pos, class = class}
     hook.Add("PreDrawTranslucentRenderables", "easy_luadebugger2", renderEntitites)
     hook.Add("PreDrawHalos", "easy_luadebugger", renderHaloEntities)
 end
 
-net.Receive("easy_luadebugger", function()
-    local id = net.ReadUInt(8)
-    if id == 1 then
-        addPosition(net.ReadVector())
-    elseif id == 2 then
-        local entId = net.ReadUInt(32)
-        if entId == 0 then return end
+if CLIENT then
+    net.Receive("easy_luadebugger", function()
+        local id = net.ReadUInt(8)
+        if id == 1 then
+            addPosition(net.ReadVector())
+        elseif id == 2 then
+            local entId = net.ReadUInt(32)
+            if entId == 0 then return end
 
-        local ent = Entity(entId)
-        addEntity(ent, net.ReadVector(), net.ReadString())
-    end
-end)
+            local ent = Entity(entId)
+            addEntity(entId, ent, net.ReadVector(), net.ReadString())
+        end
+    end)
+end
