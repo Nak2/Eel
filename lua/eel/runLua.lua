@@ -151,8 +151,11 @@ end
 
 --#region Print
 
-local function print_value(v,i,e)
-    e = e or ""
+---Prints a value
+---@param v any
+---@param i string? #Indentation string
+---@return any
+local function print_value(v,i)
     i = i or ""
     local t = type(v)
     if t == "table" then
@@ -162,7 +165,7 @@ local function print_value(v,i,e)
             return
         else
             -- table
-            _msgC(Eel.RealmColor,i .. " " .. tostring(v) .. e .. "\n")
+            _msgC(Eel.RealmColor,i .. " " .. tostring(v) .. (v.MetaName and "[" .. v.MetaName .. "]" or "") .. "\n")
             return v
         end
     elseif t == "Vector" then
@@ -185,31 +188,47 @@ local function print_value(v,i,e)
     _msgN()
 end
 
-local function rPrint(s, l, i, mdone)
+---Recursively prints variables
+---@param v any
+---@param l number lines
+---@param i string indentation string
+---@param depth number
+---@param mdone table<any, boolean> Table of already printed variables
+---@return number lines
+local function rPrint(v, l, i, depth, mdone)
     l = l or 100
     i = i or ""
+    depth = depth or 0
     mdone = mdone or {}
     if ( l < 1 ) then
         print_value("ERROR: Item limit reached.")
         return l-1
     end
-    if type(s) ~= "table" or s.r and s.g and s.b and s.a then
-        print_value(s,i)
-        return l-1
-    end
-    if mdone[s] or s.MetaName and mdone[s.MetaName] then
-        print_value(s,i, s.MetaName and "[" .. s.MetaName .. "]")
+    if type(v) ~= "table" or v.r and v.g and v.b and v.a then
+        print_value(v, i)
         return l - 1
     end
-    print_value(s,i)
-    mdone[s] = true
-    if s.MetaName then
-        mdone[s.MetaName] = true
+    if mdone[v] or v.MetaName and mdone[v.MetaName] then
+        print_value(v,i)
+        return l - 1
     end
-    for k,v in pairs(s) do
+
+    print_value(v,i)
+    mdone[v] = true
+    if v.MetaName then
+        mdone[v.MetaName] = true
+    end
+
+    for k, v2 in pairs(v) do
         if tostring(k) == "__map" then continue end
+
+        if mdone[k] or depth > 1 then
+            print_value(v2,i)
+            continue
+        end
+
         local str_i = i .. "\t[" .. tostring(k) .. "]"
-        l = rPrint(v, l, str_i .. "\t" , mdone);
+        l = rPrint(v2, l, str_i .. "\t", depth + 1, mdone);
         if (l < 0) then break end
     end
     return l
