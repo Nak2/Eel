@@ -5,6 +5,17 @@ local whiteList = {
 
 if SERVER then
     util.AddNetworkString("easy_luadebugger")
+    util.AddNetworkString("eel_phys_mesh")
+
+    local luaRun = CAMI.RegisterPrivilege({Name = "EasyLua Debugger", MinAccess = "superadmin"})
+
+    local accessRun = function(ply, func, ...)
+        local args = {...}
+        CAMI.PlayerHasAccess(ply, luaRun.Name, function(bAccess)
+            if not bAccess then return end
+            func(unpack(args))
+        end)
+    end
 
     ---Debug displays a variable on the client's screen.
     ---@param var any
@@ -26,6 +37,88 @@ if SERVER then
             end
         net.Send(ply)
     end
+
+    -- Receives a physics mesh request from a client.
+    local function sendMesh(ply, entIndex)
+        local ent = Entity(entIndex)
+        local function send(positions)
+            net.Start("eel_phys_mesh")
+                net.WriteUInt(entIndex, 16)
+                net.WriteUInt(#positions, 16)
+                for _, pos in ipairs(positions) do
+                    net.WriteVector(pos)
+                end
+            net.Send(ply)
+        end
+
+        if not IsValid(ent) then
+            send({})
+            return
+        end
+
+        local positions = {}
+        local physCount = math.max(ent:GetPhysicsObjectCount(), 1)
+
+        -- Returns a valid PhysObj at index i, or nil. Handles the common case where
+        -- GetPhysicsObjectNum returns [NULL PHYSOBJ] and falls back to GetPhysicsObject.
+        local function getPhysObjAt(index)
+            local p = ent:GetPhysicsObjectNum(index)
+            if IsValid(p) then return p end
+            if index == 0 then
+                local fallback = ent:GetPhysicsObject()
+                if IsValid(fallback) then return fallback end
+            end
+            return nil
+        end
+
+        local function addTris(phys, tris)
+            if not tris then return end
+            for i = 1, #tris - 2, 3 do
+                local a, b, c = tris[i], tris[i + 1], tris[i + 2]
+                if a and b and c and a.pos and b.pos and c.pos then
+                    -- Convert phys-local -> world -> entity-local so mesh aligns with entity origin/angles
+                    positions[#positions + 1] = ent:WorldToLocal(phys:LocalToWorld(a.pos))
+                    positions[#positions + 1] = ent:WorldToLocal(phys:LocalToWorld(b.pos))
+                    positions[#positions + 1] = ent:WorldToLocal(phys:LocalToWorld(c.pos))
+                end
+            end
+        end
+
+        for i = 0, physCount - 1 do
+            local phys = getPhysObjAt(i)
+            if not phys then continue end
+
+            local convexes = phys:GetMeshConvexes() or false
+            if convexes then
+                for _, convex in ipairs(convexes) do
+                    addTris(phys, convex)
+                end
+            else
+                addTris(phys, phys:GetMesh() or false)
+            end
+        end
+
+        -- Each Vector is 12 bytes; cap well below the 64KB net message limit.
+        local MAX_POSITIONS = 4500 -- 1500 triangles
+        if #positions > MAX_POSITIONS then
+            local capped = {}
+            for i = 1, MAX_POSITIONS, 3 do
+                capped[#capped + 1] = positions[i]
+                capped[#capped + 1] = positions[i + 1]
+                capped[#capped + 1] = positions[i + 2]
+            end
+            positions = capped
+        end
+
+        send(positions)
+    end
+
+    net.Receive("eel_phys_mesh", function(_, ply)
+        local entIndex = net.ReadUInt(16)
+        accessRun(ply, function()
+            sendMesh(ply, entIndex)
+        end, entIndex)
+    end)
     return
 end
 

@@ -44,7 +44,56 @@ local accessRun = function(ply, func, ...)
     end)
 end
 
-concommand.Add( "el_delete_all", function(ply,_,_,argStr)
+-- Print sequence of the current entity's sequence or filters the sequence by the input
+if CLIENT then
+    concommand.Add( "el_ent_sequence", function(ply,_,_,argStr)
+        if not argStr then return end
+        accessRun(ply, function(argStr)
+            local ent = ply:GetEyeTrace().Entity
+            if not IsValid(ent) then
+                Eel.Msg(ply, "No entity in sight")
+                return
+            end
+
+            local seqs = {}
+            local filter = string.Trim(argStr):lower()
+            for i = 0, ent:GetSequenceCount() - 1 do
+                local name = ent:GetSequenceName(i)
+                if name:lower():find(filter, 1, false) then
+                seqs[i] = name
+                end
+            end
+            
+            local n = table.Count(seqs)
+            if n == 0 then
+                Eel.Msg(ply, "No sequences found matching: ", argStr)
+            else
+                local sortedSeqs = {}
+                for i in pairs(seqs) do
+                table.insert(sortedSeqs, i)
+                end
+                table.sort(sortedSeqs)
+                
+                local msg = n .. (n == 1 and " sequence" or " sequences")
+                local lineCount = 0
+                for _, i in ipairs(sortedSeqs) do
+                msg = msg .. "\n\t" .. i .. ": " .. seqs[i]
+                lineCount = lineCount + 1
+                if lineCount >= 100 then
+                    MsgC(Eel.RealmColor, msg)
+                    msg = ""
+                    lineCount = 0
+                end
+                end
+                if msg ~= "" then
+                MsgC(Eel.RealmColor, msg .. "\n")
+                end
+            end
+        end, argStr)
+    end, nil, "Prints the current entity's sequences or filters them by the input string", FCVAR_CLIENTCMD_CAN_EXECUTE)
+end
+
+concommand.Add( "el_ent_remove_all", function(ply,_,_,argStr)
     if not argStr then return end
     accessRun(ply, function(argStr)
         local t = ents.FindByClass(argStr)
@@ -59,7 +108,7 @@ concommand.Add( "el_delete_all", function(ply,_,_,argStr)
     end, argStr)
 end, autoComplete)
 
-concommand.Add( "el_spawn", function(ply,_,args,_)
+concommand.Add( "el_ent_spawn", function(ply,_,args,_)
     if not args or not args[1] then return end
     accessRun(ply, function(args)
         local ent = ents.Create(args[1])

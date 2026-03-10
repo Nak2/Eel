@@ -21,6 +21,10 @@ runFile("eel/debugger.lua")
 runFile("eel/entityFinder.lua")
 runFile("eel/functionDigger.lua")
 runFile("eel/runLua.lua")
-runFile("eel/spawn.lua")
+runFile("eel/entities.lua")
+AddCSLuaFile("eel/hud.lua")
+if CLIENT then
+    runFile("eel/hud.lua")
+end
 
 Eel.Msg(nil, "Loaded Easy Easy Lua v" .. Eel.Version)
