@@ -12,7 +12,7 @@ Run Lua from the console with smart variables, visual debugging, and context-awa
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#-features)
 - [Smart Autocomplete](#-smart-autocomplete)
@@ -26,7 +26,7 @@ Run Lua from the console with smart variables, visual debugging, and context-awa
 
 ---
 
-## ✨ Features
+## Features
 
 Code run via `el_run` tries to return a value as an expression first, then falls back to a statement. Return values are printed with type-aware formatting:
 
@@ -44,7 +44,7 @@ Code run via `el_run` tries to return a value as an expression first, then falls
 
 ---
 
-## 🔍 Smart Autocomplete
+## Smart Autocomplete
 
 Typing `el_run` in the console opens a tab-complete dropdown that resolves identifier chains through `_G` and metatables — get completions for things like `NikNaks.` or `me:`.
 
@@ -54,7 +54,7 @@ Typing `el_run` in the console opens a tab-complete dropdown that resolves ident
 
 ---
 
-## 🧩 Environment Variables
+## Environment Variables
 
 The following shorthands are available in all `el_run` commands:
 
@@ -119,7 +119,7 @@ el_run nak:SetPos(there)
 
 ---
 
-## 🛠 Commands
+## Commands
 
 ### Execution
 
@@ -159,7 +159,7 @@ el_lazy me:SetPos there
 
 ---
 
-## 🔎 Debug Mode
+## Debug Mode
 
 | Command | Description |
 |:--|:--|
@@ -175,13 +175,13 @@ When enabled, nearby entities are rendered with:
 ---
 
 
-## 🔒 Permissions
+## Permissions
 
 EEL integrates with [CAMI](https://github.com/glua/CAMI) for admin-mod compatibility. All commands require `superadmin` access by default, configurable through any CAMI-compatible admin mod.
 
 ---
 
-## 📦 Installation
+## Installation
 
 1. Download the [latest release](https://github.com/Nak2/Eel/archive/refs/heads/main.zip) (`.zip`)
 2. Extract the contents
@@ -193,12 +193,12 @@ EEL integrates with [CAMI](https://github.com/glua/CAMI) for admin-mod compatibi
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Pull requests are welcome. For major changes, please [open an issue](https://github.com/Nak2/Eel/issues) first to discuss what you'd like to change.
 
 ---
 
-## 📄 License
+## License
 
 Licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). See [LICENSE](LICENSE) for details.
