@@ -1,107 +1,131 @@
 # EEL - Enhanced Execution Layer
 
-EEL (Enhanced Execution Layer) is an addon designed to make Garry's Mod addon development a breeze. With EEL, you can quickly run Lua commands, interact with entities, and automate repetitive tasks with ease. Whether you're a seasoned developer or just getting started.
+EEL is a Garry's Mod addon built for developers. It lets you run Lua directly from the console with smart shorthand variables, visual debugging, and tab-autocomplete that understands your codebase.
 
 ## Execution and Returns
 
-Lua executed via `el_run` and other commands will attempt to return not only the result but also the function definition along with its parameters. This aids in understanding how the function operates and assists in debugging.
+Code run via `el_run` tries to return a value as an expression first, then falls back to a statement. The return value is printed with type-aware formatting:
+
+- **Functions** — printed with their name and parameter list
+- **Vectors** — visualized in-world as a crosshair marker
+- **Entities** — highlighted with a halo and label, even serverside-only entities
+- **Colors** — rendered as an inline color swatch `▉▉▉` in the console
+- **Tables** — printed recursively with keys and values
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2989d9e1-32e5-4b6e-99c4-091d865901ab">
 </p>
 
-If a command returns a vector (position), EEL will visually display it. If it returns an entity, EEL will highlight it in the game, even if the entity is server-side only.
+## Smart Autocomplete
 
-## Commands
+Typing `el_run` in the console opens a tab-complete dropdown. It resolves identifier chains through `_G` and metatables, so you get completions for things like `NikNaks.` or `me:`. Colon access (`:`) only shows functions, with methods that take `self` as the first parameter ranked highest.
 
-### `el_run <code>` Command
-The `el_run` command allows you to execute Lua code effortlessly. It’s semi-smart, meaning it will try to automatically resolve nil variables by mapping them to common references:
+If your input contains a syntax error, the error is shown inline in the dropdown — no need to run the command to find out.
 
-- `me` / `self` - The player who calls the function.
-- `wep` - Your current weapon.
-- `trace` - Eye-trace data.
-- `this` / `that` - The entity you're looking at.
-- `here` - Your current location.
-- `there` - The location you're aiming at.
-- `near` - The nearest entity to the location you're aiming at.
-- `ent<id>` - Will return the entity with the given id. `ent0` is the same as `Entity(0)`. 
-- `prox<distance>` - All entities near your aim position, at a range you put in. Distance defaults to 128 if none is given.
+## Environment Variables
 
-If the command encounters an unknown variable, it will search in the following order:
+The following shorthand variables are available in all `el_run` commands:
+
+| Variable | Description |
+|---|---|
+| `me` / `self` | The player running the command |
+| `wep` | Your active weapon |
+| `trace` | Full eye-trace result table |
+| `this` / `that` | The entity you're looking at |
+| `here` | Your current position (Vector) |
+| `there` | The position your crosshair is hitting (Vector) |
+| `eye` | Your eye position (Vector) |
+| `fwd` | The forward direction of your view (Vector) |
+| `ang` | Your eye angles (Angle) |
+| `vel` | Your current velocity (Vector) |
+| `ground` | The entity you're standing on |
+| `hp` | Health of the entity you're looking at, or your own if looking at nothing |
+| `near` | The nearest entity to your aim position |
+| `nearme` | The nearest entity to your own position |
+| `map` | The current map name |
+| `world` | `Entity(0)` — the world entity |
+| `p` | Shorthand print: `p(value)` works mid-expression |
+| `ent<id>` | Entity by index — `ent42` is `Entity(42)`, `ent0` is the world |
+| `prox<distance>` | All entities near your aim position within `distance` units (default 128) |
+| `ply<name>` | Finds the nearest player matching the partial name — e.g. `plyNak` |
+
+If an unknown variable is used, EEL searches the map for a matching entity in this order:
 1. Player names
 2. Entity class names
 3. Entity names
 4. Entity models
-5. Nearest matching entity
+5. Returns the nearest match
 
-Example:
+**Example:**
 ```
 el_run nak:SetPos(there)
 ```
 
-<br>
+## Commands
 
-<details>
-  <summary>Show all commands</summary>
+### `el_run <code>`
+Run Lua serverside.
 
-### `el_run_cl <code>` Command
+### `el_run_cl <code>`
+Clientside equivalent of `el_run`.
 
-This is the clientside equivalent of el_run, enabling you to run Lua code on the client.
+### `el_time <code>`
+Run Lua serverside and print the execution time.
 
-### `el_sealed <code>` Command
+### `el_time_cl <code>`
+Clientside equivalent of `el_time`.
 
-The el_sealed command runs Lua code within a custom environment, giving you more control and isolation.
 
-### `el_sealed_cl <code>` Command
+### `el_sealed <code>`
+Runs code in a read-only environment — assignments are blocked, so `_G` is not modified. Useful for safe inspection.
 
-Clientside version of el_sealed.
+### `el_sealed_cl <code>`
+Clientside version of `el_sealed`.
 
-### `el_lazy <code>` Command
+### `el_lazy <code>`
+Fills in parentheses automatically so you can skip typing them. Also supports pipes to chain operations:
 
-Feeling lazy? The el_lazy command automatically fills in parentheses for you. For example:
+```
+el_lazy here - eye + there | me:SetPos
+```
+
+Is equivalent to:
+
+```
+el_run me:SetPos(here - eye + there)
+```
 ```
 el_lazy me:SetPos there
 ```
-Is the same as:
+Is equivalent to:
 ```
 el_run me:SetPos(there)
 ```
 
-### `el_lazy_cl <code>` Command
+### `el_lazy_cl <code>`
+Clientside version of `el_lazy`.
 
-Clientside version of el_lazy.
+### `el_delete_all <class>`
+Removes all entities of the given class.
 
-### `el_delete_all <entity class>` Command
-
-This command deletes all entities of a given class on the map. It also tries to autofill nearby entities for convenience.
-
-### `el_spawn <entity class> <amount>` Command
-
-Spawns a specified number of entities. By default, it spawns one entity.
-
-</details>
-
-
+### `el_spawn <class> [amount]`
+Spawns one or more entities of the given class at your aim position. Defaults to 1 if no amount is given, capped at 100.
 
 ## Permission Management
 
-EEL uses "CAMI" to integrate with admin-mods, giving you control over who can use these powerful commands. By default, these commands are only accessible by superadmins.
+EEL integrates with [CAMI](https://github.com/glua/CAMI) for compatibility with admin mods. All commands require the `superadmin` access level by default, but can be configured through any CAMI-compatible admin mod.
 
 ## Installation
 
 1. Download the latest release as a `.zip` [file](https://github.com/Nak2/Eel/archive/refs/heads/main.zip).
-2. Extract the contents of the `.zip` file.
-3. Move the extracted folder into your Garry's Mod `addons` directory. <br>The final path should look like this: `garrysmod/addons/eel/`
-4. Ensure that the `eel` folder contains the `lua` folder and other necessary files for the addon.
-5. Restart your server or client to load the addon.
+2. Extract the contents.
+3. Move the extracted folder into your `garrysmod/addons/` directory so the final path is `garrysmod/addons/eel/`.
+4. Restart your server or client.
 
 ## Contributing
 
-Feel free to fork this repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
-License
+Feel free to fork and submit pull requests. For major changes, please open an issue first to discuss what you'd like to change.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0. You can view the full license in the [LICENSE](LICENSE) file.
-
-For more details, see [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file or [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html) for details.

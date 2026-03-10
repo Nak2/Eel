@@ -57,13 +57,13 @@ local function renderPosition(pos)
     render.DrawLine(pos + Vector(size,0,0), pos + Vector(-size,0,0), c, true)
 end
 
-local function renderPositions(a, b, c)
-    if a or b or c then return end
+local function renderPositions(a, b)
+    if a or b then return end
     local curtime = CurTime()
-    for k,v in pairs(debugPos) do
+    for k, v in pairs(debugPos) do
         if v.time < curtime then
             debugPos[k] = nil
-            if table.Count(debugPos) == 0 then
+            if next(debugPos) == nil then
                 hook.Remove("PostDrawTranslucentRenderables", "easy_luadebugger")
                 return
             end
@@ -75,28 +75,28 @@ end
 
 local function renderHaloEntities()
     local c = getFlashColor()
-    for k,v in pairs(debugEnts) do
-        if v.time < CurTime() then
+    local curtime = CurTime()
+    for k, v in pairs(debugEnts) do
+        if v.time < curtime then
             debugEnts[k] = nil
-            if table.Count(debugEnts) == 0 then
+            if next(debugEnts) == nil then
                 hook.Remove("PreDrawHalos", "easy_luadebugger")
                 return
             end
         elseif v.ent and IsValid(v.ent) then
-            -- Render halo
             halo.Add({v.ent}, c, 2, 2, 1, true, true)
         end
     end
 end
 
-local function renderEntitites(a, b, c)
-    if a or b or c then return end
+local function renderEntitites(a, b)
+    if a or b then return end
 
-    c = getFlashColor()
-    for k,v in pairs(debugEnts) do
-        if v.time < CurTime() then
+    local curtime = CurTime()
+    for k, v in pairs(debugEnts) do
+        if v.time < curtime then
             debugEnts[k] = nil
-            if table.Count(debugEnts) == 0 then
+            if next(debugEnts) == nil then
                 hook.Remove("PreDrawTranslucentRenderables", "easy_luadebugger2")
                 return
             end

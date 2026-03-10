@@ -39,8 +39,8 @@ end
 function Eel.FilterByClass(name, tab)
     name = string.lower(name)
     local matches = {}
-    for _, v in pairs(tab or ents.GetAll()) do
-        if(string.find(string.lower(v:GetClass()),name,1,true) ~= nil) then
+    for _, v in ipairs(tab or ents.GetAll()) do
+        if string.find(string.lower(v:GetClass()), name, 1, true) then
             table.insert(matches, v)
         end
     end

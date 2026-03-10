@@ -2,30 +2,33 @@
 ---Auto complete for delete all command
 ---@param cmd string
 ---@param argStr string
----@param args string[]
 ---@return string[] # List of possible completions
-local function autoComplete(cmd, argStr, args)
-    local pos = LocalPlayer and LocalPlayer():GetPos();
-    local entsNearby = pos and ents.FindInSphere(pos, 2000)
-        or ents.GetAll()
+local function autoComplete(cmd, argStr)
+    local pos = LocalPlayer and LocalPlayer():GetPos()
+    local entsNearby = pos and ents.FindInSphere(pos, 2000) or ents.GetAll()
 
     local filtered = Eel.FilterByClass(string.Trim(argStr), entsNearby)
-    local t = {}
-    -- Add classname and distance to the table
-    for i,v in pairs( filtered ) do
-        local dis = pos and v:GetPos():Distance(pos) or 0
 
-        if t[v:GetClass()] and t[v:GetClass()] < dis then continue end
-        t[v:GetClass()] = dis
+    -- Deduplicate by class, keeping closest distance
+    local classMap = {}
+    for _, v in ipairs(filtered) do
+        local class = v:GetClass()
+        local dis = pos and v:GetPos():Distance(pos) or 0
+        if not classMap[class] or dis < classMap[class] then
+            classMap[class] = dis
+        end
     end
 
-    -- Sort by distance
-    table.sort(t, function(a,b) return a[2] < b[2] end)
+    -- Convert to sortable array and sort by distance
+    local sorted = {}
+    for class, dis in pairs(classMap) do
+        table.insert(sorted, {class, dis})
+    end
+    table.sort(sorted, function(a, b) return a[2] < b[2] end)
 
-    -- Grab the max first 10
     local ret = {}
-    for class,_ in pairs(t) do
-        table.insert(ret, cmd .. " " .. class)
+    for _, pair in ipairs(sorted) do
+        table.insert(ret, cmd .. " " .. pair[1])
         if #ret >= 8 then break end
     end
     return ret
@@ -50,11 +53,11 @@ concommand.Add( "el_delete_all", function(ply,_,_,argStr)
             return
         end
 
-        for i,v in pairs( t ) do
+        for _, v in ipairs(t) do
             SafeRemoveEntity(v)
         end
     end, argStr)
-end, CLIENT and autoComplete or autoComplete)
+end, autoComplete)
 
 concommand.Add( "el_spawn", function(ply,_,args,_)
     if not args or not args[1] then return end

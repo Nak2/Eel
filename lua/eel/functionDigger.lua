@@ -1,11 +1,14 @@
 
-local cache = {}
+-- File content cache persists across runs (file data never changes at runtime)
+local fileCache = {}
+-- Function data cache is cleared between el_run calls
+local funcCache = {}
 
 local function getFile(fileName)
-    if cache[fileName] then return cache[fileName] end
+    if fileCache[fileName] then return fileCache[fileName] end
     local fileData = file.Read(fileName,"GAME")
     if not fileData then return nil end
-    cache[fileName] = fileData
+    fileCache[fileName] = fileData
     return fileData
 end
 
@@ -33,7 +36,7 @@ local function getParams(v)
 
     local i = 1
     while param ~= nil do
-        table.insert(paramTable,param)
+        paramTable[i] = param
         i = i + 1
         param = getlocal( v, i )
     end
@@ -57,18 +60,18 @@ local getinfo = debug.getinfo
 local function getFunctionDef(v)
     local info = getinfo(v)
     if info == nil then return tostring(v) .. getParamsString(v) end
-    local source = info["short_src"]
+    local source = info.short_src
 
-    if source == "=[C]" or info["what"] ~= "Lua" then
+    if source == "=[C]" or info.what ~= "Lua" then
         return "[C] " .. tostring(v) .. getParamsString(v)
     end
 
-    if not file.Exists(source,"GAME") then return tostring(v) .. getParamsString(v) end
+    if not file.Exists(source, "GAME") then return tostring(v) .. getParamsString(v) end
 
     local filedata = getFile(source)
     if not filedata then return tostring(v) .. getParamsString(v) end
 
-    local linePos = findSkip(filedata or "","\n",info.linedefined - 1)
+    local linePos = findSkip(filedata, "\n", info.linedefined - 1)
     if linePos == nil then return tostring(v) .. getParamsString(v) end
 
     -- Locate the first "function" keyword with one space
@@ -101,17 +104,16 @@ end
 ---@return string
 ---@return string
 function Eel.GetFunctionData(f)
-    if cache[f] then return cache[f][1],cache[f][2] end
+    if funcCache[f] then return funcCache[f][1], funcCache[f][2] end
     local tab = debug.getinfo(f)
-    if not tab then return "Unknown","Unknown" end
-    local source = tab["short_src"] or "Unknown"
-    source = source .. "#L" .. (tab["linedefined"] or 0)
+    if not tab then return "Unknown", "Unknown" end
+    local source = (tab.short_src or "Unknown") .. "#L" .. (tab.linedefined or 0)
 
     local name = getFunctionDef(f)
-    cache[f] = {name,source}
-    return name,source
+    funcCache[f] = {name, source}
+    return name, source
 end
 
 function Eel.ClearFunctionDataCache()
-    cache = {}
+    funcCache = {}
 end

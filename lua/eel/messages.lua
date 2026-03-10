@@ -48,12 +48,12 @@ local function read_array()
 end
 
 local function write_array(tab)
-    for i, value in pairs(tab) do
+    for i, value in ipairs(tab) do
         if type(value) == "table" and value.r and value.g and value.b and value.a then
             net.WriteUInt(V_COL, 2)
             net.WriteColor(value)
         else
-            local str = tostring(value) or ""
+            local str = tostring(value)
             net.WriteUInt(V_STR, 2)
             local compress = util.Compress(str) --[[@as string]]
             net.WriteUInt(#compress, 32)
