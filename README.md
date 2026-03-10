@@ -28,7 +28,7 @@ Run Lua from the console with smart variables, visual debugging, and context-awa
 
 ## ✨ Features
 
-Code run via `el_run` tries to return a value as an expression first, then falls back to a statement. Return values are printed with **type-aware formatting**:
+Code run via `el_run` tries to return a value as an expression first, then falls back to a statement. Return values are printed with type-aware formatting:
 
 | Type | Output |
 |:--|:--|
@@ -58,47 +58,47 @@ Typing `el_run` in the console opens a tab-complete dropdown that resolves ident
 
 The following shorthands are available in all `el_run` commands:
 
-<details open>
+<details closed>
 <summary><b>Player & World</b></summary>
 
 | Variable | Description |
 |:--|:--|
 | `me` / `self` | The player running the command |
 | `wep` | Your active weapon |
-| `ground` | The entity you're standing on |
+| `ground` | Ground entity of what you're looking at, or your own if looking at nothing |
 | `world` | `Entity(0)` — the world entity |
 | `map` | The current map name |
 
 </details>
 
-<details open>
+<details closed>
 <summary><b>Spatial</b></summary>
 
 | Variable | Description |
 |:--|:--|
 | `here` | Your current position (Vector) |
 | `there` | The position your crosshair is hitting (Vector) |
-| `eye` | Your eye position (Vector) |
-| `fwd` | The forward direction of your view (Vector) |
-| `ang` | Your eye angles (Angle) |
-| `vel` | Your current velocity (Vector) |
+| `eye` | Eye position of what you're looking at, or your own (Vector) |
+| `fwd` | Forward direction of what you're looking at, or your own (Vector) |
+| `ang` | Angle of what you're looking at, or your own (Angle) |
+| `vel` | Velocity of what you're looking at, or your own (Vector) |
 
 </details>
 
-<details open>
+<details closed>
 <summary><b>Targeting</b></summary>
 
 | Variable | Description |
 |:--|:--|
 | `trace` | Full eye-trace result table |
 | `this` / `that` | The entity you're looking at |
-| `hp` | Health of the aimed entity, or your own if looking at nothing |
+| `hp` | Health of what you're looking at, or your own if looking at nothing |
 | `near` | The nearest entity to your aim position |
 | `nearme` | The nearest entity to your own position |
 
 </details>
 
-<details open>
+<details closed>
 <summary><b>Dynamic Lookups</b></summary>
 
 | Pattern | Description |
