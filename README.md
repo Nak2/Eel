@@ -170,7 +170,10 @@ When enabled, nearby entities are rendered with:
 - **Collision mesh wireframe** — actual physics hull from the server, drawn as a cyan wireframe
 - **Entity info overlay** — class, model, position, angles, velocity, physics state, animation data, health, render properties, materials, and more
 
+<img width="694" height="632" alt="debugmode" src="https://github.com/user-attachments/assets/7e5c4660-958a-40f1-a3b7-16dc946832e0" />
+
 ---
+
 
 ## 🔒 Permissions
 
