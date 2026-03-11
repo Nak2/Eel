@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ EEL — Enhanced Execution Layer
+# EEL — Enhanced Execution Layer
 
 **A developer power-tool for Garry's Mod.**
 Run Lua from the console with smart variables, visual debugging, and context-aware autocomplete.
@@ -14,15 +14,15 @@ Run Lua from the console with smart variables, visual debugging, and context-awa
 
 ## Table of Contents
 
-- [Features](#-features)
-- [Smart Autocomplete](#-smart-autocomplete)
-- [Environment Variables](#-environment-variables)
-- [Commands](#-commands)
-- [Debug Mode](#-debug-mode)
-- [Permissions](#-permissions)
-- [Installation](#-installation)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Features](#features)
+- [Smart Autocomplete](#smart-autocomplete)
+- [Environment Variables](#environment-variables)
+- [Commands](#commands)
+- [Debug Mode](#debug-mode)
+- [Permissions](#permissions)
+- [Installation](#installation)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
