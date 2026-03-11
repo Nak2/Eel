@@ -170,10 +170,11 @@ When enabled, nearby entities are rendered with:
 - **Collision mesh wireframe** — actual physics hull from the server, drawn as a cyan wireframe
 - **Entity info overlay** — class, model, position, angles, velocity, physics state, animation data, health, render properties, materials, and more
 
-<img width="694" height="632" alt="debugmode" src="https://github.com/user-attachments/assets/7e5c4660-958a-40f1-a3b7-16dc946832e0" />
+<p align="center">
+  <img width="694" height="632" alt="debugmode" src="https://github.com/user-attachments/assets/7e5c4660-958a-40f1-a3b7-16dc946832e0" />
+</p>
 
 ---
-
 
 ## Permissions
 
@@ -195,7 +196,7 @@ EEL integrates with [CAMI](https://github.com/glua/CAMI) for admin-mod compatibi
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please [open an issue](https://github.com/Nak2/Eel/issues) first to discuss what you'd like to change.
+Pull requests are welcome.
 
 ---
 
