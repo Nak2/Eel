@@ -15,7 +15,7 @@ return function(printer, CreateEnv, autoComplete)
     -- Compile code, trying expression form first then statement form.
     -- Returns the compiled function, or nil (and sends the error to ply).
     local function compileLua(ply, code)
-        local envName = (IsValid(ply) and ply:Nick() or "Console") .. "'s Environment"
+        local envName = (IsValid(ply) and ply.Nick and ply:Nick() or "Console") .. "'s Environment"
         local compiler = CompileString("return " .. code, envName, false)
         if not isfunction(compiler) then
             compiler = CompileString(code, envName, false)
