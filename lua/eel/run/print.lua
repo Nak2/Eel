@@ -69,6 +69,7 @@ local function print_value(v, i)
         else
             _msgC(Eel.RealmColor, i .. tostring(v) .. (v.MetaName and " [" .. v.MetaName .. "]" or "") .. "\n")
         end
+        _msgN()
         return
     elseif t == "Vector" then
         _msgC(Eel.RealmColor, i .. "Vector(" .. fmtNum(v.x) .. ", " .. fmtNum(v.y) .. ", " .. fmtNum(v.z) .. ")")
