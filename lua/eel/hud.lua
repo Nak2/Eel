@@ -417,8 +417,8 @@ local function RenderDebugMode()
     local ply = LocalPlayer()
     if not IsValid(ply) then return end
 
-    local plyPos  = ply:GetPos()
-    local eyeFwd  = EyeAngles():Forward()
+    local plyPos  = EyePos()
+    local eyeFwd  = EyeVector()
     local max     = maxHudRender:GetInt()
 
     -- Single pass: validate, cull behind-player, and cache distSqr so the sort
