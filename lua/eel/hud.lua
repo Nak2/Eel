@@ -14,6 +14,7 @@ local pendingMeshRequests = {}          -- key -> true, prevents duplicate serve
 local renderedThisFrame = {}            -- key -> true, tracks which meshes were used this frame
 local debugDrawMatrix = Matrix()
 local defaultNormal = Vector(0, 0, 1)
+local maxHudRender = CreateClientConVar("el_debug_mode_max", "5", true, false, "Maximum number of entities to render debug info for on the HUD. Set to 0 for unlimited.", 0)
 
 local function getEntityNumber(ent, methodName, fallback)
     local method = ent[methodName]
@@ -60,6 +61,18 @@ local function getCollisionMeshKey(ent)
     return string.format("%s|%.4f|%d", model, modelScale, collisionGroup)
 end
 
+local MAX_COORD = 32768 -- Source engine hard limit for world coordinates
+
+local function isValidTriangle(a, b, c)
+    for _, v in ipairs({ a, b, c }) do
+        local x, y, z = v.pos.x, v.pos.y, v.pos.z
+        -- Reject NaN (NaN != itself) and coords outside Source's valid range.
+        if x ~= x or y ~= y or z ~= z then return false end
+        if math.abs(x) > MAX_COORD or math.abs(y) > MAX_COORD or math.abs(z) > MAX_COORD then return false end
+    end
+    return true
+end
+
 -- Receives server-extracted physics triangles and builds the cached IMesh.
 net.Receive("eel_phys_mesh", function()
     local entIndex = net.ReadUInt(16)
@@ -68,9 +81,9 @@ net.Receive("eel_phys_mesh", function()
     local ent = Entity(entIndex)
 
     -- Always drain the buffer so the net stream stays valid.
-    local triangles = {}
+    local raw = {}
     for i = 1, count do
-        triangles[i] = { pos = net.ReadVector(), normal = defaultNormal, u = 0, v = 0 }
+        raw[i] = { pos = net.ReadVector(), normal = defaultNormal, u = 0, v = 0 }
     end
 
     if not IsValid(ent) then return end
@@ -80,6 +93,22 @@ net.Receive("eel_phys_mesh", function()
 
     if count < 3 then
         -- Model has no physics data; mark nil so we don't re-request every frame.
+        debugCollisionMeshesByModel[key] = { mesh = nil }
+        return
+    end
+
+    -- Strip any triangles with bad vertex data before handing off to the GPU.
+    local triangles = {}
+    for i = 1, #raw - 2, 3 do
+        local a, b, c = raw[i], raw[i + 1], raw[i + 2]
+        if isValidTriangle(a, b, c) then
+            triangles[#triangles + 1] = a
+            triangles[#triangles + 1] = b
+            triangles[#triangles + 1] = c
+        end
+    end
+
+    if #triangles < 3 then
         debugCollisionMeshesByModel[key] = { mesh = nil }
         return
     end
@@ -180,7 +209,7 @@ end
 
 local DEBUG_HEADER_COLOR = Color(120, 200, 255)
 
-local function drawEntityInfo(ent)
+local function drawEntityInfo(ent, showDetails)
     local labelPos = ent:GetPos()
     local toScreen = labelPos:ToScreen()
     if not toScreen.visible then return end
@@ -197,6 +226,12 @@ local function drawEntityInfo(ent)
             debugLine("Index: (client-only)", sx, y)
         else
             debugLine("Index: " .. ent:EntIndex(), sx, y)
+        end
+
+        -- If player is looking away from the entity, only show basic info.
+        if not showDetails then
+            cam.End2D()
+            return
         end
 
         local model = ent:GetModel()
@@ -379,22 +414,44 @@ local function drawEntityInfo(ent)
 end
 
 local function RenderDebugMode()
-    -- Enables the debug mode. Rendering collision bounds as a wireframe on entities, and showing entity info on the HUD.
     local ply = LocalPlayer()
     if not IsValid(ply) then return end
 
-    -- Grab entities in a nearby sphere of the player and render like vcollide_wireframe 1.
-    -- Shows physics collision of studio models of entities derived from CBaseAnimating as a cyan wireframe during run-time.
-    local nearbyEnts = ents.FindInSphere(ply:GetPos(), DEBUG_DRAW_RADIUS)
+    local plyPos  = ply:GetPos()
+    local eyeFwd  = EyeAngles():Forward()
+    local max     = maxHudRender:GetInt()
 
-    for _, ent in ipairs(nearbyEnts) do
-        if(!IsValid(ent) or ent == ply or ent:GetOwner() == ply) then continue end
-        if ent ~= ply and IsValid(ent) and ent:GetModel() and ent:GetModel() ~= "" then
-            if ent:EntIndex() >= 1 and not ent:IsRagdoll() then
-                drawCollisionMesh(ent)
-            end
-            drawEntityInfo(ent)
+    -- Single pass: validate, cull behind-player, and cache distSqr so the sort
+    -- comparator never calls GetPos() again.
+    local candidates = {}
+    for _, ent in ipairs(ents.FindInSphere(plyPos, DEBUG_DRAW_RADIUS)) do
+        if not IsValid(ent) or ent == ply or ent:GetOwner() == ply then continue end
+
+        local toEnt = ent:GetPos() - plyPos
+        local distSqr = toEnt:LengthSqr()
+        if distSqr < 1 then continue end
+
+        local dist = math.sqrt(distSqr)
+        local dot  = eyeFwd:Dot(toEnt * (1 / dist))
+        if dot < 0 then continue end
+
+        -- Blend: entities you look directly at are treated as closer.
+        -- (2 - dot) ranges 1.0 (aimed at) -> 2.0 (perpendicular), keeping units in linear space.
+        candidates[#candidates + 1] = { ent = ent, score = dist * (2 - dot), dot = dot }
+    end
+
+    table.sort(candidates, function(a, b) return a.score < b.score end)
+
+    local limit = (max > 0) and math.min(max, #candidates) or #candidates
+    for idx = 1, limit do
+        local c   = candidates[idx]
+        local ent = c.ent
+        if not IsValid(ent) then continue end
+        local model = ent:GetModel()
+        if ent:EntIndex() >= 1 and model and model ~= "" and not ent:IsRagdoll() then
+            drawCollisionMesh(ent)
         end
+        drawEntityInfo(ent, idx == 1) -- only the top-scored entity gets full detail
     end
 
     evictUnusedMeshes()
