@@ -12,7 +12,9 @@ return function(finder, printer)
         local trace = isValidPly and ply:GetEyeTrace() or {}
         local traceEnt = trace.Entity or NULL
         local plyPos = isValidPly and ply:GetPos() or Vector()
-        local mix = trace.Entity and not trace.Entity:IsWorld() and trace.Entity or isValidPly and ply or Entity(0)
+        local mix = (IsValid(traceEnt) and traceEnt)
+            or (isValidPly and ply)
+            or nil
         return setmetatable({
             me     = isValidPly and ply or NULL,
             self   = isValidPly and ply or NULL,
